@@ -1,0 +1,16 @@
+version: "3.9" # the docker-compose syntax version
+
+# we start to define every dependency of our app'
+services:
+    # the unique dependency in this project: the Apache server, we gave it the arbitrary name of apache-server
+    apache-server:
+        # image pulled from DockerHub
+        image: php:8.0-apache 
+        ports:
+            # mapping port 80 of our host machine to port 80 of the container, that will be used by Apache
+            # this has to effect of appearing to run the containerized web server as if it was directly run on our host machine
+            # go to http://localhost and see it work !
+            - 80:80 
+        volumes:
+            # mapping your project files to in-container /var/www folder from where your app' will be served
+            - .:/var/www/html 
