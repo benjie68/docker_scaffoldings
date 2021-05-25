@@ -1,0 +1,12 @@
+{
+    "name": "yactouat/php-apps-apache-php-composer",
+    "authors": [
+        {
+            "name": "Yacine Touati",
+            "email": "yacine.touati.pro@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.3"
+    }
+}

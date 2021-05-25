@@ -9,6 +9,7 @@ services:
         ports:
             # mapping port 80 of our host machine to port 80 of the container, that will be used by Apache
             # this has to effect of appearing to run the containerized web server as if it was directly run on our host machine
+            # ! remember to kill already running process on port 80 before trying to run this containerized app'
             # go to http://localhost and see it work !
             - 80:80 
         volumes:
