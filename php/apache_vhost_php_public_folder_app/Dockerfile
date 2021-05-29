@@ -1,7 +1,7 @@
 # image pulled from DockerHub
 FROM php:8.0-apache
 
-# create system user ("appuser" with uid 1000) to run Composer commands
+# create system user ("appuser" with uid 1000) 
 RUN useradd -G www-data,root -u 1000 -d /home/appuser appuser
 RUN mkdir -p /home/appuser/.composer && \
     chown -R appuser:appuser /home/appuser
@@ -17,8 +17,8 @@ RUN a2enmod rewrite
 # copy Apache virtual host
 COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 
-# changing user (because cannot run Composer as root)
+# changing user 
 USER appuser
 
-# installing Composer deps and running Apache
+# running Apache
 CMD apache2-foreground

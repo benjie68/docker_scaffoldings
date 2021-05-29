@@ -1,0 +1,62 @@
+version: '3.9'
+
+# we define volumes here, which are persistant storage places to keep your data after the containers have stopped
+# FR -> définition des volumes, c'est à dire des lieux où l'on va persister des données après l'arrêt des containers
+volumes:
+  app-database:
+      # the local driver means we persist the data on the host machine
+      # FR -> le driver local signifie que la persistence des données a lieu au niveau de la machine hôte
+      driver: local
+
+# we define connectivity here, which range from communication between containers to communication with the outside world
+# FR -> configuration de la connectivité, que ce soit entre containers ou bien avec l'extérieur
+networks:
+  app-network:
+      driver: bridge
+
+services:
+  # service 1: database
+  # FR -> service 1: base de données
+  db:
+    image: 'mariadb:10'
+    ports:
+        - '${FORWARD_DB_PORT:-3306}:3306'
+    environment:
+        MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes' # ! ONLY IN DEV ENVIRONMENT
+        MYSQL_DATABASE: 'appdb'
+        MYSQL_USER: 'appdbuser'
+        MYSQL_PASSWORD: 'appdbpwd'
+        MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    # we map the previously defined persistence volume to where the rdms stores data on the container's "disk"
+    # FR -> on mappe le volume de persistence précedemment créé au chemin où MariaDB stocke les bases de données dans le container
+    volumes:
+        - 'app-database:/var/lib/mysql'
+    # referencing the network here allows for this service to communicate with the app'
+    # FR -> on référence le réseau défini préalablement pour ce service car c'est ce réseau qu'il utilisera pour permettre la communication avec l'app' (qui est le service n°2)
+    networks:
+        - app-network
+    # default conf. to check if everything runs ok
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+    # we tell Docker to restart this container unless we voluntarly stop it
+    # FR -> on informe Docker qu'il faut redémarrer ce container s'il n'est pas stoppé explicitement par l'utilisateur
+    restart: unless-stopped
+  # service 2: app
+  # FR -> service 2: application 
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    # we give the app' image an arbitrary name
+    # FR -> on donne à l'image de notre application un nom à notre convenance
+    image: app-image
+    # arbitrary name for container
+    container_name: app-container
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+    ports:
+      - 80:80
